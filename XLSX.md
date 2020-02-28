@@ -1,4 +1,4 @@
-## 基于[SheetJS js-xlsx](https://github.com/SheetJS/sheetjs)读取本地 `excel` 返回 `json` 数据组件模板
+## 基于[SheetJS js-xlsx](https://github.com/SheetJS/sheetjs)读取并本地 `excel` 返回 `json` 数据组件模板
 
 ```
 import {Button, Upload} from 'antd';
