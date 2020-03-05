@@ -12,8 +12,9 @@
 > ## useRef  
 > 除了传统的用法（ `ref` 获取组件实例对象 或者 是DOM对象）之外，它还可以 “跨渲染周期 - 组件被多次渲染之后依旧不变，如 `state` ，但是，state的问题在于一旦修改了它就会造成组件的重新渲染 ” 保存数据。例：ref 对象的 current 属性来存储定时器的ID，这样便可以在多次渲染之后依旧保存定时器ID，从而能正常清除定时器。
 
+## 🔨 Usage
 
-```
+```jsx
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 export default function Example(props){
@@ -53,5 +54,4 @@ export default function Example(props){
     </div>
   );
 }
- 
 ```
