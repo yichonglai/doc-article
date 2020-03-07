@@ -10,7 +10,7 @@
 
 ## useEffect `componentDidMount，componentDidUpdate 和 componentWillUnmount 这三个函数的组合`
 
-> 用于在函数组件中执行副作用操作（数据获取、订阅、操作dom等），默认情况下，它在第一次渲染之后和每次更新之后都会执行。
+> 用于在函数组件中执行副作用操作（数据获取、订阅、操作dom等），默认情况下，它在第一次渲染之后和每次更新之后都会执行；调用一个新的 effect 之前会对前一个 effect 进行清理；传递数组作为 useEffect 的第二个可选参数避免不必要 effect 调用。
 
 ## useRef  
 
