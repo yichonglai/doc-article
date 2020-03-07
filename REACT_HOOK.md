@@ -8,7 +8,7 @@
 
 > 用于在函数组件中保存状态 `state`。
 
-## useEffect `componentDidMount，componentDidUpdate 和 componentWillUnmount 这三个函数的组合`
+## useEffect `componentDidMount` 、`componentDidUpdate` 和 `componentWillUnmount` 这三个函数的组合
 
 > 用于在函数组件中执行副作用操作（数据获取、订阅、操作dom等），默认情况下，它在第一次渲染之后和每次更新之后都会执行。
 

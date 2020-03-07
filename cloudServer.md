@@ -1,4 +1,4 @@
-# 云服务器环境配置及测试
+# 云服务器环境配置及测试（node / nginx）
 
 ## 阿里云 / 腾讯云
 
@@ -10,7 +10,7 @@
 ### 客户端工具（也可以网页登录）
 
 - Mac
-终端中输入：```SSH root@服务器IP地址(公网)``` (SSH root@xxx.xxx.xxx.xxx) 回车 输入购买服务器时设置的实例密码 回车
+终端中输入：`SSH root@服务器IP地址(公网)` (SSH root@xxx.xxx.xxx.xxx) 回车 输入购买服务器时设置的实例密码 回车
 - Windows
   - 下载工具 Xshell
   - 打开Xshell - 文件 - 新建，终端选项选择编码：Unicode(UTF-8)
@@ -112,8 +112,6 @@ dist  package.json  server.js
             "cookie-parser": "^1.4.3",
             "express": "^4.16.2",
             "mysql": "^2.14.0",
-            "node-sass": "^4.5.3",
-            "node-uuid": "^1.4.8"
         },
         "engines": {
             "node": ">= 4.0.0",
@@ -133,7 +131,7 @@ dist  package.json  server.js
 
 进入文件夹 server，打开 server.js
 
-```js
+```vim
 [root@VM_0_11_centos111 project1]# vim server.js
 
 const path = require('path');
@@ -154,29 +152,29 @@ console.log('success listen at port:80......');
 
 ```
 
-设置静态资源路径，并修改监听端口为80（HTTP端口），端口也可以设置其他值（如8000），但这样在访问地址时就需要加上端口号,，80端口可以省略不写
+设置静态资源路径，并修改监听端口为80（HTTP端口），端口也可以设置其他值（如8000），但这样在访问地址时就需要加上端口号，80端口可以省略不写
 
-#### 启动服务
+### 启动服务
 
-```vim
+```bash
 [root@VM_0_11_centos111 project1]# node server.js
 success listen at port:80......
 ```
 
 浏览器打开 服务器IP:80，如无意外，即正常运行访问啦。
 
-#### 绑定域名
+### 绑定域名
 
 进入域名管理后台，解析域名，添加解析,绑定成功后，直接输入域名即可访问。
 
-#### 安装 pm2
+### 安装 pm2
 
 > pm2 是一个带有负载均衡功能的Node应用的进程管理器.
 
 上面我们以 node server.js 启动了项目，当我们退出 Xshell/Mac终端 时，进程就会关闭，无法在访问到项目，而 pm2 就是
 解决这种问题的，以 pm2 启动项目后，退出依然可以正常访问。
 
-```vim
+```bash
 // 安装 pm2
 [root@VM_0_11_centos111 /]# npm install -g pm2
 
@@ -187,10 +185,13 @@ cnpm  node  npm  npx  pm2  ...
 
 bin 下都是命令语句，为了可以在任何目录都可以使用命令，我们将此文件夹加入环境变量
 
-- 查看环境变量 [root@VM_0_11_centos111 ~]# echo $PATH
+- 查看环境变量 
+  ```bash
+  [root@VM_0_11_centos111 ~]# echo $PATH
+  ```
 - 添加环境变量
 
-    ```vim
+    ```bash
     [root@VM_0_11_centos111 ~]# vim /etc/profile
     // 在文档最后，添加:
     # node
@@ -200,13 +201,13 @@ bin 下都是命令语句，为了可以在任何目录都可以使用命令，�
 
     保存或
 
-    ```vim
+    ```bash
     echo 'export PATH=/usr/local/node-v12.15.0/bin:$PATH' >> /etc/profile
     ```
 
     然后运行
 
-    ```vim
+    ```bash
     [root@VM_0_11_centos111 ~]# source /etc/profile
     ```
 
@@ -214,7 +215,7 @@ bin 下都是命令语句，为了可以在任何目录都可以使用命令，�
 
 pm2 启动项目
 
-```vim
+```bash
 // 启动进程
 [root@VM_0_11_centos111 project1]# pm2 start server.js
 // 停止进程
@@ -223,26 +224,26 @@ pm2 启动项目
 [root@VM_0_11_centos111 project1]# pm2 list
 ```
 
-#### 刷新页面404
+### 刷新页面404
 
 [HTML5 History 模式](https://router.vuejs.org/zh-cn/essentials/history-mode.html)
 
 ## Nginx 服务器
 
-> 上面我们是直接以 node 启动一个服务器，监听 80 端口，这样我们就可以直接以 IP 地址或域名的方式访问，也可以监听其他端口如3000，这样我们就得在地址后加上 : 端口号，显然这样很麻烦，且一般 node 程序基本不监听 80 端口，还可能同时运行几个 node 项目，监听不同的端口，通过二级域名来分别访问。 这里就用到 Nginx 来实现反向代理。（node 利用 node-http-proxy 包也可以实现反向代理，有兴趣自己了解）
+> 上面我们是直接以 node 启动一个服务器，监听 80 端口，这样我们就可以直接以 IP 地址或域名的方式访问，如果监听其他端口如8001，我们就只得ip地址后加上:端口号访问，这样很麻烦，且一般 node 程序基本不监听 80 端口，还可能同时运行几个 node 项目，监听不同的端口，这时可用 Nginx 来实现反向代理（node 利用 node-http-proxy 包也可以实现反向代理），通过二级域名来分别访问。 
 
 ### Nginx安装
 
 Nginx依赖下面3个包:
 
-1. SSL功能需要openssl库，下载地址 [http://www.openssl.org/](http://www.openssl.org/)
-2. rewrite模块需要pcre库，下载地址 [http://www.pcre.org/](http://www.pcre.org/)
-3. gzip模块需要zlib库，下载地址 [http://www.zlib.net/](http://www.zlib.net/)
+1. [SSL功能需要openssl库](http://www.openssl.org/)
+2. [rewrite模块需要pcre库](http://www.pcre.org/)
+3. [gzip模块需要zlib库](http://www.zlib.net/)
 4. Nginx安装包
 
 进入任意目录下载以上压缩包(版本号改为最新即可)：
 
-```vim
+```bash
 [root@VM_0_11_centos111 download]# wget http://www.zlib.net/zlib-1.2.11.tar.gz
 [root@VM_0_11_centos111 download]# wget https://ftp.pcre.org/pub/pcre/pcre-8.41.tar.gz
 [root@VM_0_11_centos111 download]# wget https://www.openssl.org/source/openssl-fips-2.0.16.tar.gz
@@ -254,14 +255,14 @@ nginx-1.13.7.tar.gz  openssl-fips-2.0.16.tar.gz
 
 解压压缩包：
 
-```vim
+```bash
 [root@VM_0_11_centos111 download]# tar zxvf zlib-1.2.11.tar.gz
 [root@VM_0_11_centos111 download]# tar tar zxvf pcre-8.41.tar.gz
 [root@VM_0_11_centos111 download]# tar zxvf openssl-fips-2.0.16.tar.gz
 [root@VM_0_11_centos111 download]# tar zxvf nginx-1.13.7.tar.gz
 ```
 
-安装 C++ 编译环境 （上面安装过程中如若有报错，可以看看是不是因为没有安装这个，可提前安装）
+安装 C++ 编译环境 （否则以下安装过程会报错）
 
 ```vim
 yum install gcc-c++
@@ -269,7 +270,7 @@ yum install gcc-c++
 
 先安装3个依赖包，分别进入各自解压目录
 
-```vim
+```bash
 // 看清各个目录下的是 configure 还是 config
 [root@VM_0_11_centos111 zlib-1.2.11]# ./configuer && make && make install
 [root@VM_0_11_centos111 pcre-8.41]# ./configuer && make && make install
@@ -282,7 +283,7 @@ yum install gcc-c++
 
 安装好的Nginx路径在 /usr/local/nginx
 
-```vim
+```bash
 [root@VM_0_11_centos111 ~]# cd /usr/local/nginx
 [root@VM_0_11_centos111 nginx]# ls  conf  html  logs  nginx.conf sbin   ....
 ```
@@ -295,14 +296,14 @@ yum install gcc-c++
 
 运行Nginx：
 
-```vim
+```bash
 [root@VM_0_11_centos111 ~]# cd /usr/local/nginx/sbin
 [root@VM_0_11_centos111 sbin]# ./nginx
 // 查看是否运行成功
 [root@VM_0_11_centos111 sbin]# netstat -ntlp
 Active Internet connections (only servers)
 Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
-tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      3525/nginx: master
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      8634/nginx: master
 ```
 
 浏览器输入 IP 地址或域名即可见到欢迎页面。
@@ -311,16 +312,16 @@ tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      
 
 现在nginx启动、关闭比较麻烦，关闭要找到PID号，然后杀死进程，启动要进入到 /usr/local/nginx/sbin 目录下使用命令，为此我们通过设置System V脚本来使用server命令启动、关闭、重启nginx服务。
 
-1. 在 /etc/init.d 目录下创建nginx启动脚本文件
+1. 在 `/etc/init.d` 目录下创建nginx启动脚本文件
 
-    ```vim
+    ```bash
     [root@VM_0_11_centos111 ~]# cd /etc/init.d
     [root@VM_0_11_centos111 init.d]# vim nginx
     ```
 
-2. 将以下代码复制粘贴进去，然后保存。 注意 NGINX_BIN、CONFIGFILE、PIDFILE 三个目录要对应好，默认是对应好的。在网上找了好多相关脚本代码，都有很多问题，好像是和 CentOS 版本有关，下面脚本我在 CentOS 7 下使用正常。
+2. 将以下代码复制粘贴进去，然后保存。 注意 NGINX_BIN、CONFIGFILE、PIDFILE 三个目录要对应好。
 
-    ```vim
+    ```nginx
     #! /bin/sh
     # chkconfig: 2345 55 25
     # Description: Startup script for nginx webserver on Debian. Place in /etc/init.d and
@@ -445,25 +446,25 @@ tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      
 
 3. 修改脚本权限
 
-    ```vim
-    chmod a+x /etc/init.d/nginx
+    ```bash
+    [root@VM_0_11_centos111 ~]# chmod a+x /etc/init.d/nginx
     ```
 
 4. 注册成服务
 
-    ```vim
-    chkconfig --add nginx
+    ```bash
+    [root@VM_0_11_centos111 ~]# chkconfig --add nginx
     ```
 
 5. 设置开机启动
 
-    ```vim
-    chkconfig nginx on
+    ```bash
+    [root@VM_0_11_centos111 ~]# chkconfig nginx on
     ```
 
 这样就可以在任意目录通过service启动、关闭nginx
 
-```vim
+```bash
 [root@VM_0_11_centos111 ~]# service nginx start
 [root@VM_0_11_centos111 ~]# service nginx stop
 [root@VM_0_11_centos111 ~]# service nginx restart
@@ -472,31 +473,25 @@ tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      
 ### 配置nginx.conf反向代理多个node项目
 
 1. 启动多个node项目，分别监听不同端口，如
-    - 项目1，监听端口3000，为博客项目，域名访问 www.cc1111.com 或 cc1111.com
-    - 项目2，监听端口8023，为游戏项目，域名访问 club.cc1111.com
-2. 在阿里云服务区控制台开放端口3000和8023，（80端口是必须的，nginx监听）
-3. 绑定二级域名 club.cc1111.com，添加域名解析
-    - 记录类型：A
-    - 主机记录：game
-    - 解析线路：默认
-    - 记录纸：IP地址
-    - TTL至：600S（默认）
+    - 项目1，监听端口3000，域名访问 cc.com
+    - 项目2，监听端口3001，域名访问 club.cc.com
+2. 在阿里云服务区控制台开放端口3000和3001，（80端口是必须的，nginx监听）
+3. 绑定二级域名 club.cc.com，添加域名解析
 4. 修改nginx配置  
-    进入目录 /usr/local/nginx/conf 修改配置文件nginx.conf
+    进入目录 `/usr/local/nginx/conf` 修改配置文件`nginx.conf`
 
-    ```vim
+    ```bash
     [root@VM_0_11_centos111 ~]# cd /usr/local/nginx/conf
     [root@VM_0_11_centos111 conf]# ls
-    fastcgi.conf          fastcgi_params          koi-utf  mime.types          nginx.conf          scgi_params          uwsgi_params          win-utf
-    fastcgi.conf.default  fastcgi_params.default  koi-win  mime.types.default  nginx.conf.default  scgi_params.default  uwsgi_params.default
+    fastcgi.conf          fastcgi_params          koi-utf  mime.types          nginx.conf          ...
     [root@VM_0_11_centos111 conf]# vim nginx.conf
     // server 内容替换为
         server {
             listen 80;
-            server_name club.cc1111.com;
+            server_name club.cc.com;
             location / {
                 proxy_set_header   Host      $http_host;
-                proxy_pass         http://127.0.0.1:8023;
+                proxy_pass         http://127.0.0.1:3001;
                 proxy_redirect     off;
                 proxy_set_header   X-Real-IP       $remote_addr;
                 proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -505,7 +500,7 @@ tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      
 
         server {
             listen 80;
-            server_name cc1111.com www.cc1111.com;
+            server_name cc.com www.cc.com;
 
             # 解决刷新404的问题
             location /blog {
@@ -522,19 +517,10 @@ tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      
         }
     ```
 
-    若只配置一个server，club.c c1111.com、cc1111.com、www.cc1111.com 都将可以访问到这个端口。想要反响代理更多端口，可再增加server，也可以将server单独出来为一个文件，如club-8023.conf，blog-3000.conf，然后在nginx.conf中引入文件地址即可
-
-    ```vim
-    http {
-        ......
-        include ./vhost/club-8023.conf;
-        include ./vhost/blog-3000.conf;
-        ......
-    }
-    ```
+    若只配置一个server，club.cc.com、cc.com 都将可以访问到这个端口。
 
 5. 重启nginx
 
-    ```vim
+    ```bash
     [root@VM_0_11_centos111 ~]# service nginx restart
     ```
