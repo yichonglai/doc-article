@@ -11,6 +11,7 @@
 ## useEffect `componentDidMount` 、`componentDidUpdate` 和 `componentWillUnmount` 这三个函数的组合
 
 > 用于在函数组件中执行副作用操作（数据获取、订阅、操作dom等），默认情况下，它在第一次渲染之后和每次更新之后都会执行；调用一个新的 effect 之前会对前一个 effect 进行清理；传递数组作为 useEffect 的第二个可选参数避免不必要 effect 调用。
+> > Warning: useEffect function must return a cleanup function or nothing. Promises and useEffect(async () => …) are not supported, but you can call an async function inside an effect
 
 ## useRef  
 
@@ -20,6 +21,7 @@
 
 ```jsx
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import axios from 'axios';
 
 export default function Example(props){
   // useState
@@ -48,6 +50,15 @@ export default function Example(props){
       console.log('清除需要清除的副作用，如定时器等')
     }
   });
+  // 每个async函数都会默认返回一个隐式的promise
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await axios('url');
+      // ...
+    };
+
+    fetchData();
+  }, []);
   
   return (
     <div>
