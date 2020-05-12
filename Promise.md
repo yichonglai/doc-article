@@ -46,7 +46,7 @@ function Promise(fn) {
       return;
     }
     // Promises/A+ spec requires that promise resolution happen asynchronously.
-    // real promise libraries tend to use process.nextTick（NodeJS），for browsers maybe an asynchronous library 
+    // real promise libraries tend to use process.nextTick（NodeJS），for browsers maybe an asynchronous library
     setTimeout(function() {
       var handlerCallback;
 
@@ -140,7 +140,7 @@ class Promise {
       return;
     }
     // Promises/A+ spec requires that promise resolution happen asynchronously.
-    // real promise libraries tend to use process.nextTick（NodeJS），for browsers maybe an asynchronous library 
+    // real promise libraries tend to use process.nextTick（NodeJS），for browsers maybe an asynchronous library
     setTimeout(function() {
       var handlerCallback;
 
